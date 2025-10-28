@@ -1,0 +1,81 @@
+{% extends 'notes/base.html' %}
+
+{% block title %}Tableau de Bord{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var labels = JSON.parse('{{ notes_per_tag|safe|escapejs }}').map(tag => tag.name);
+    var data = JSON.parse('{{ notes_per_tag|safe|escapejs }}').map(tag => tag.notes_count);
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var ctx = document.getElementById('chartTags').getContext('2d');
+        var chartTags = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Nombre de Notes',
+                    data: data,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    });
+</script>
+
+
+
+<h1 class="text-center mb-4">📊 Tableau de Bord</h1>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card text-center shadow p-3">
+            <h4>📄 Notes Totales</h4>
+            <p class="display-6">{{ total_notes }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow p-3">
+            <h4>✅ Notes Terminées</h4>
+            <p class="display-6">{{ notes_terminees }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow p-3">
+            <h4>⏳ Notes en cours</h4>
+            <p class="display-6">{{ notes_en_cours }}</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow p-3">
+            <h4>🏷️ Tags Totaux</h4>
+            <p class="display-6">{{ total_tags }}</p>
+        </div>
+    </div>
+</div>
+
+<h2 class="mt-4">📌 Notes par Tag</h2>
+<ul class="list-group">
+    {% for tag in notes_per_tag %}
+    <li class="list-group-item d-flex justify-content-between">
+        <span>{{ tag.name }}</span>
+        <span class="badge bg-primary">{{ tag.notes_count }}</span>
+    </li>
+    {% empty %}
+    <li class="list-group-item">Aucun tag n'a encore de notes.</li>
+    {% endfor %}
+</ul>
+
+<canvas id="chartTags" width="400" height="200"></canvas>
+
+{% endblock %}
