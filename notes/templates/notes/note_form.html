@@ -1,86 +1,98 @@
 {% extends 'notes/base.html' %}
 
-{% block title %}Ajouter/Modifier une Note{% endblock %}
+{% block title %}
+    {% if form.instance.pk %}Modifier{% else %}Nouvelle{% endif %} Opération
+{% endblock %}
 
 {% block content %}
-<h1 class="text-center mb-4">
-    {% if form.instance.pk %}Modifier{% else %}Ajouter{% endif %} une Note
-</h1>
+<div class="container mt-4" style="max-width: 900px;">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'note_list' %}" class="text-decoration-none text-muted">Opérations</a></li>
+            <li class="breadcrumb-item active">{% if form.instance.pk %}Édition{% else %}Création{% endif %}</li>
+        </ol>
+    </nav>
 
-<div class="card p-4 shadow">
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label class="form-label">Titre</label>
-            {{ form.title }}
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Contenu</label>
-            {{ form.content }}
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Tags</label>
-            <div class="tag-list">
-                {{ form.tags }}
+    <h2 class="fw-bold text-dark mb-4">
+        <i class="bi bi-pencil-square me-2"></i>
+        {% if form.instance.pk %}Modifier l'opération{% else %}Nouvelle opération{% endif %}
+    </h2>
+
+    <div class="card border-0 shadow-sm p-4" style="border-radius: 12px;">
+        <form method="post" id="operationForm">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase text-muted">Titre de l'intervention</label>
+                {{ form.title }}
             </div>
-        </div>
-        <style>
-            .tag-list {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 10px;
-                margin-top: 10px;
-            }
 
-            .tag-list ul {
-                list-style: none;
-                padding: 0;
-                margin: 0;
-            }
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase text-muted">Description du Problème</label>
+                {{ form.problem_description }}
+            </div>
 
-            .tag-list li {
-                margin-bottom: 0;
-            }
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Date Début</label>
+                    {{ form.start_date }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Date Fin (Est.)</label>
+                    {{ form.end_date }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small text-uppercase text-muted">Statut</label>
+                    {{ form.status }}
+                </div>
+            </div>
 
-            .tag-list label {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 8px 12px;
-                background-color: #fff;
-                border: 2px solid #0d6efd;
-                border-radius: 50px;
-                cursor: pointer;
-                font-weight: 500;
-                color: #0d6efd;
-                transition: all 0.2s ease;
-                box-shadow: 0 2px 6px rgba(13, 110, 253, 0.07);
-            }
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase text-muted">
+                    <i class="bi bi-tags me-1"></i> Étiquettes / Tags
+                </label>
+                <div class="tag-container p-3 border rounded bg-light">
+                    {{ form.tags }}
+                </div>
+            </div>
 
-            .tag-list label:hover {
-                background-color: #e7f1ff;
-                border-color: #0a58ca;
-            }
+            <div class="mb-4">
+                <label class="form-label fw-bold small text-uppercase text-muted">Solution proposée / Rapport</label>
+                <div class="border rounded">
+                    {{ form.proposed_solution }}
+                </div>
+            </div>
 
-            .tag-list input[type="checkbox"] {
-                accent-color: #0d6efd;
-                margin-right: 8px;
-                width: 18px;
-                height: 18px;
-            }
+            <hr class="my-4 text-muted">
 
-            .tag-list input[type="checkbox"]:checked+label {
-                background-color: #0d6efd;
-                color: #fff;
-                border-color: #0d6efd;
-            }
-        </style>
-        <div class="mb-3">
-            <label class="form-label">Statut</label>
-            {{ form.resultat }}
-        </div>
-        <button type="submit" class="btn btn-success">✅ Enregistrer</button>
-        <a href="{% url 'note_list' %}" class="btn btn-secondary">⬅ Retour</a>
-    </form>
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'note_list' %}" class="btn btn-light px-4 border">
+                    <i class="bi bi-arrow-left me-2"></i>Annuler
+                </a>
+                <button type="submit" class="btn btn-dark px-5">
+                    <i class="bi bi-check2-circle me-2"></i>Enregistrer l'opération
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
+<style>
+    /* Style pour les labels de tags en mode multi-select */
+    .tag-container select {
+        height: 120px;
+        border: none;
+        background: transparent;
+    }
+    
+    /* Harmonisation avec CKEditor */
+    .django-ckeditor-widget {
+        width: 100% !important;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #1a1a1a;
+        box-shadow: 0 0 0 0.25rem rgba(26, 26, 26, 0.1);
+    }
+</style>
 {% endblock %}

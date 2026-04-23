@@ -1,100 +1,287 @@
 {% extends 'notes/base.html' %}
 
-{% block title %}Bienvenue sur NotionClone{% endblock %}
+{% load static %}
+
+{% block title %}Opero | Pilotage Technique de vos Projets{% endblock %}
 
 {% block content %}
-<div class="landing-page">
-    <!-- Hero Section -->
-    <section class="hero py-5">
-        <div class="container">
-            <div class="row align-items-center min-vh-75">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold mb-4">Organisez vos idées simplement</h1>
-                    <p class="lead mb-4">Créez, organisez et partagez vos notes en toute simplicité. Une solution
-                        moderne pour garder vos idées organisées.</p>
-                    {% if user.is_authenticated %}
-                    <a href="{% url 'note_list' %}" class="btn btn-primary btn-lg me-3">
-                        <i class="bi bi-journal-text"></i> Mes Notes
-                    </a>
-                    {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
-                        <i class="bi bi-box-arrow-in-right"></i> Commencer
-                    </a>
-                    <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg">
-                        <i class="bi bi-person-plus"></i> S'inscrire
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-5">Fonctionnalités principales</h2>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-journal-text display-4 text-primary mb-3"></i>
-                            <h3 class="h4 mb-3">Notes personnelles</h3>
-                            <p class="text-muted">Créez et organisez vos notes avec un éditeur riche en fonctionnalités.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-tags display-4 text-primary mb-3"></i>
-                            <h3 class="h4 mb-3">Organisation par tags</h3>
-                            <p class="text-muted">Classez vos notes avec des tags pour une meilleure organisation.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-graph-up display-4 text-primary mb-3"></i>
-                            <h3 class="h4 mb-3">Tableau de bord</h3>
-                            <p class="text-muted">Visualisez vos statistiques et suivez votre progression.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-</div>
-{% endblock %}
-
-{% block extra_styles %}
 <style>
-    .landing-page {
-        margin-top: -2rem;
+    :root {
+        --dark-color: #1a202c;
+        --gray-text: #4a5568;
+        --section-spacing: 120px; 
     }
 
-    .hero {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    /* Utilitaires d'espacement */
+    .section-wrapper {
+        padding-top: var(--section-spacing);
+        padding-bottom: var(--section-spacing);
+        overflow: hidden;
     }
 
-    .min-vh-75 {
-        min-height: 75vh;
+    .bg-soft-light { background-color: #f8fafc; }
+    .bg-white { background-color: #ffffff; }
+
+    /* Typographie Sobre */
+    .main-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        line-height: 1.1;
+        letter-spacing: -2px;
+        color: var(--dark-color);
     }
 
-    .card {
-        transition: transform 0.2s ease-in-out;
-    }
-
-    .card:hover {
-        transform: translateY(-10px);
-    }
-
-    .display-4 {
+    .section-title {
+        color: var(--dark-color);
         font-weight: 700;
-        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+    }
+
+    /* Hero Section */
+    .hero-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-visual-wrapper {
+        position: relative;
+        perspective: 1000px;
+    }
+
+    .hero-img-card {
+        border-radius: 24px;
+        box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25);
+        transform: rotateY(-5deg) rotateX(5deg);
+        transition: all 0.5s ease;
+    }
+
+    /* Cards de fonctionnalités */
+    .feature-card {
+        padding: 3rem;
+        border-radius: 24px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+        border-color: #2d3748;
+        transform: translateY(-8px);
+    }
+
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 2rem;
+    }
+
+    /* Video Section */
+    .video-frame-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        border-radius: 24px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .video-thumbnail {
+        aspect-ratio: 16/9;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-play-modern {
+        width: 80px;
+        height: 80px;
+        background: #ffffff;
+        border: none;
+        border-radius: 50%;
+        color: var(--dark-color);
+        font-size: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+    .btn-play-modern:hover {
+        transform: scale(1.1);
+        background: #f8fafc;
+    }
+
+    @media (max-width: 768px) {
+        :root { --section-spacing: 80px; }
+        .hero-container { text-align: center; }
     }
 </style>
+
+<div class="landing-page">
+    
+    <section class="section-wrapper bg-soft-light hero-container">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <h1 class="main-title fw-bold mb-4">
+                        Pilotez votre technique avec Opero
+                    </h1>
+                    <p class="lead text-muted mb-5 fs-5">
+                        L'outil de gestion de tâches conçu pour la clarté technique. 
+                        Simplifiez vos flux de travail et centralisez vos décisions.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'dashboard' %}" class="btn btn-dark btn-lg px-5 py-3 rounded-3 shadow">
+                                Accéder au cockpit
+                            </a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-dark btn-lg px-5 py-3 rounded-3 shadow">
+                                Commencer maintenant
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-visual-wrapper">
+                        <img src="{% static 'img/hero.jpg' %}" 
+                             class="img-fluid hero-img-card d-none d-lg-block" alt="Opero Dashboard">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="section-wrapper bg-white">
+        <div class="container">
+            <div class="text-center mb-5 pb-5">
+                <h2 class="display-5 section-title mb-3">Pensé pour la performance</h2>
+                <p class="text-muted fs-5">Une interface sobre pour un focus total sur vos tâches.</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="icon-circle bg-dark text-white">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <h3 class="fw-bold h4">Rapidité native</h3>
+                        <p class="text-muted mb-0">Zéro friction. Une expérience fluide pensée pour les développeurs exigeants.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="icon-circle bg-dark text-white">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3 class="fw-bold h4">Données sécurisées</h3>
+                        <p class="text-muted mb-0">Vos notes techniques et vos backlogs sont protégés avec rigueur.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="icon-circle bg-dark text-white">
+                            <i class="bi bi-terminal"></i>
+                        </div>
+                        <h3 class="fw-bold h4">Dashboard Technique</h3>
+                        <p class="text-muted mb-0">Visualisez l'état de vos sprints avec des indicateurs de performance précis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-wrapper bg-soft-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 section-title mb-4">Voyez Opero en Action</h2>
+            </div>
+            
+            <div class="video-frame-container">
+                <div id="video-thumbnail" class="video-thumbnail" 
+                     style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop');">
+                    
+                    <button id="play-video-btn" class="btn-play-modern mb-4">
+                        <i class="bi bi-play-fill"></i>
+                    </button>
+                    <p class="text-white fw-bold">DÉMONSTRATION PRODUIT</p>
+                </div>
+
+                <div id="video-player-wrapper" class="d-none">
+                <div class="ratio ratio-16x9">
+                    <iframe id="video-iframe" 
+                            src="" 
+                            title="YouTube video player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-wrapper bg-white">
+    <div class="container text-center">
+        {% if user.is_authenticated %}
+            <div class="py-5 px-4 rounded-4 bg-light border shadow-sm">
+                <h2 class="display-6 fw-bold mb-3 text-dark">Ravi de vous revoir, {{ user.username }} !</h2>
+                <p class="lead mb-4 text-muted">Votre espace de pilotage technique est prêt. Continuez à suivre vos opérations en cours.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'dashboard' %}" class="btn btn-dark btn-lg px-5 py-3 rounded-3 fw-bold">
+                        <i class="bi bi-speedometer2 me-2"></i>Accéder au Dashboard
+                    </a>
+                    <a href="{% url 'note_create' %}" class="btn btn-outline-dark btn-lg px-4 py-3 rounded-3">
+                        <i class="bi bi-plus-lg me-2"></i>Nouvelle Tâche
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="py-5 px-4 rounded-4 bg-dark text-white shadow-lg">
+                <h2 class="display-6 fw-bold mb-4">Prêt à reprendre le contrôle ?</h2>
+                <p class="lead mb-5 text-secondary">Inscrivez-vous et commencez à piloter vos projets dès aujourd'hui.</p>
+                <a href="{% url 'login' %}" class="btn btn-light btn-lg px-5 py-3 rounded-3 fw-bold">
+                    Créer mon compte
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const playBtn = document.getElementById('play-video-btn');
+        const thumbnail = document.getElementById('video-thumbnail');
+        const playerWrapper = document.getElementById('video-player-wrapper');
+        const iframe = document.getElementById('video-iframe');
+
+        // Correction : ajout de mute=1 et enablejsapi=1 pour éviter l'erreur 153
+        const videoSource = "https://www.youtube.com/embed/YpoNPAX8yGA?autoplay=1&mute=1&rel=0&enablejsapi=1"; 
+
+        playBtn.addEventListener('click', function() {
+            // Masquer la vignette avec une transition propre
+            thumbnail.style.opacity = '0';
+            
+            setTimeout(() => {
+                thumbnail.style.display = 'none';
+                playerWrapper.classList.remove('d-none');
+                
+                // On injecte l'URL seulement maintenant
+                iframe.setAttribute('src', videoSource);
+            }, 300);
+        });
+    });
+</script>
 {% endblock %}

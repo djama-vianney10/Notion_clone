@@ -1,9 +1,5 @@
-from django.contrib import admin
-from .models import Note, Tag
+from django.contrib import admin  # <-- Cette ligne manquait !
+from .models import Operation, Tag
 
-# Register your models here.
-
-
-admin.site.register(Note)
+admin.site.register(Operation)
 admin.site.register(Tag)
-

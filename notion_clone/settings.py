@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,8 +30,46 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 LOGIN_URL = 'login'
+SITE_ID = 1
 LOGIN_REDIRECT_URL = 'note_list'
-LOGOUT_REDIRECT_URL = 'index'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'index'
+# Permet la redirection directe vers le fournisseur sans page intermédiaire
+SOCIALACCOUNT_LOGIN_ON_GET = True
+# 1. Ne pas demander de formulaire d'inscription si les infos sont complètes
+SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+# 2. Tenter de créer le compte automatiquement
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+# Ne demande pas d'email de confirmation
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+# L'email n'est pas obligatoire pour créer le compte (évite de bloquer si GitHub est timide)
+ACCOUNT_EMAIL_REQUIRED = False
+
+# Si l'email est déjà utilisé par un autre compte, on lie les deux au lieu d'échouer
+SOCIALACCOUNT_QUERY_EMAIL = True
+
+
+
+# 3. Réglages spécifiques pour GitHub afin de récupérer l'email même s'il est privé
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'SCOPE': [
+            'user:email',
+            'read:user',
+        ],
+    },
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
 
 
 # Messages configuration
@@ -44,8 +84,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google', # Pour Google
+    'allauth.socialaccount.providers.github', # Pour GitHub
     'notes',
     'ckeditor',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 
@@ -57,6 +108,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'notion_clone.urls'
@@ -126,6 +178,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

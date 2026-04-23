@@ -4,8 +4,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.utils import timezone
-from .models import Note, Tag
-from .forms import NoteForm, RegisterForm
+from .models import Operation, Tag
+from .forms import OperationForm, RegisterForm
 
 
 
@@ -35,66 +35,61 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    # Récupérer les statistiques pour l'utilisateur connecté
-    total_notes = Note.objects.filter(user=request.user).count()
-    notes_this_month = Note.objects.filter(
-        user=request.user,
-        created_at__month=timezone.now().month
-    ).count()
-
-    notes_terminees = Note.objects.filter(user=request.user, resultat='termine').count()
-    notes_en_cours = Note.objects.filter(user=request.user, resultat='en_cours').count()
-
-    notes_per_tag = Tag.objects.annotate(
-        notes_count=Count('notes', filter=Q(notes__user=request.user))
-    ).values('name', 'notes_count')
-
-    total_tags = Tag.objects.count()
-    context = {
-        'total_notes': total_notes,
-        'notes_this_month': notes_this_month,
-        'notes_terminees': notes_terminees,
-        'notes_en_cours': notes_en_cours,
-        'notes_per_tag': list(notes_per_tag),
-        'total_tags': total_tags,
+    user_ops = Operation.objects.filter(user=request.user)
+    
+    # Statistiques
+    stats = {
+        'total': user_ops.count(),
+        'termine': user_ops.filter(status='termine').count(),
+        'en_cours': user_ops.filter(status='en_cours').count(),
+        'bloque': user_ops.filter(status='bloque').count(),
+        'attente': user_ops.filter(status='attente').count(),
     }
-    return render(request, 'notes/dashboard.html', context)
 
+    tags_data = Tag.objects.annotate(
+        count=Count('operations', filter=Q(operations__user=request.user))
+    ).filter(count__gt=0).values('name', 'count')
+
+    return render(request, 'notes/dashboard.html', {
+        'stats': stats,
+        'tags_data': list(tags_data),
+    })
 
 @login_required
 def note_list(request):
-    notes = Note.objects.filter(user=request.user)
-    return render(request, 'notes/note_list.html', {'notes': notes})
+    operations = Operation.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'notes/note_list.html', {'operations': operations})
 
 @login_required
 def note_create(request):
     if request.method == "POST":
-        form = NoteForm(request.POST)
+        form = OperationForm(request.POST)
         if form.is_valid():
-            note = form.save(commit=False)
-            note.user = request.user
-            note.save()
-            form.save_m2m()  # Pour sauvegarder les relations ManyToMany (tags)
+            op = form.save(commit=False)
+            op.user = request.user
+            op.save()
+            form.save_m2m()
             return redirect('note_list')
     else:
-        form = NoteForm()
+        form = OperationForm()
     return render(request, 'notes/note_form.html', {'form': form})
 
 @login_required
 def note_edit(request, pk):
-    note = get_object_or_404(Note, pk=pk, user=request.user)
+    op = get_object_or_404(Operation, pk=pk, user=request.user)
     if request.method == "POST":
-        form = NoteForm(request.POST, instance=note)
+        form = OperationForm(request.POST, instance=op)
         if form.is_valid():
-            note = form.save()
+            form.save()
             return redirect('note_list')
     else:
-        form = NoteForm(instance=note)
+        form = OperationForm(instance=op)
     return render(request, 'notes/note_form.html', {'form': form})
 
 @login_required
 def note_delete(request, pk):
-    note = get_object_or_404(Note, pk=pk, user=request.user)
-    note.delete()
+    operation = get_object_or_404(Operation, pk=pk, user=request.user)
+    operation.delete()
+    messages.success(request, "L'opération a été supprimée avec succès.")
     return redirect('note_list')
 

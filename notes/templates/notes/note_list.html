@@ -1,82 +1,200 @@
 {% extends 'notes/base.html' %}
 
-{% block title %}📒 Mes Notes{% endblock %}
+{% block title %}Opero | Pilotage Technique{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="m-0"><i class="bi bi-journal-text"></i> Mes Notes</h1>
-    <a href="{% url 'note_create' %}" class="btn btn-primary">
-        <i class="bi bi-plus-lg"></i> Nouvelle Note
-    </a>
-</div>
+<style>
+    :root {
+        --notion-bg: #ffffff;
+        --notion-text: #1a1a1a; /* Noir plus profond pour le professionnalisme */
+        --notion-hover: #f7f7f5;
+        --notion-border: #edece8;
+        --accent-blue: #2383e2; /* Bleu professionnel style "SaaS" */
+    }
 
-<div class="card">
-    <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-            <thead>
-                <tr>
-                    <th>Titre</th>
-                    <th>Contenu</th>
-                    <th class="text-center">Tags</th>
-                    <th class="text-center">Statut</th>
-                    <th class="text-center">Actions</th>
+    body {
+        background-color: var(--notion-bg);
+        color: var(--notion-text);
+        font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    /* En-tête Technique */
+    .notion-header {
+        padding: 60px 0 30px 0;
+        border-bottom: 1px solid var(--notion-border);
+        margin-bottom: 0;
+    }
+
+    .notion-title {
+        font-size: 1.75rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--notion-text);
+    }
+
+    .header-icon {
+        color: var(--notion-text);
+        opacity: 0.8;
+        font-size: 1.5rem;
+    }
+
+    /* Bouton d'action raffiné */
+    .btn-notion-add {
+        background: var(--notion-text);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        transition: opacity 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-notion-add:hover {
+        opacity: 0.9;
+        color: white;
+    }
+
+    /* Table Database */
+    .notion-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+    }
+
+    .notion-table th {
+        color: #7a7a7a;
+        font-weight: 500;
+        text-align: left;
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--notion-border);
+        background: #fafafa;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+    }
+
+    .notion-table tr {
+        border-bottom: 1px solid var(--notion-border);
+        transition: background 0.1s;
+    }
+
+    .notion-table tr:hover {
+        background: var(--notion-hover);
+    }
+
+    .notion-table td {
+        padding: 14px 15px;
+        vertical-align: middle;
+    }
+
+    /* Tags Techniques */
+    .notion-tag {
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        background: #f1f1f0;
+        color: #444;
+        border: 1px solid #e2e2e2;
+        margin-right: 4px;
+    }
+
+    /* Status Dot */
+    .status-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        font-size: 12px;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .dot-working { background-color: #f1c40f; box-shadow: 0 0 0 3px rgba(241, 196, 15, 0.1); }
+    .dot-done { background-color: #2ecc71; box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1); }
+
+    .action-icon {
+        color: #bcbcbc;
+        transition: color 0.2s;
+    }
+
+    .action-icon:hover { color: var(--notion-text); }
+    .action-icon.delete-hover:hover { color: #d9534f; }
+
+</style>
+
+<div class="container">
+    <header class="notion-header container mt-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div class="d-flex flex-column">
+            <h1 class="notion-title mb-0" style="font-weight: 700; font-size: 2.5rem; letter-spacing: -0.02em;">
+                <i class="bi bi-cpu me-2"></i>Pilotage Technique
+            </h1>
+            <p class="text-muted mt-2 mb-0" style="font-size: 1.1rem; opacity: 0.8;">
+                Suivi des opérations et des backlogs
+            </p>
+        </div>
+
+        <div>
+            <a href="{% url 'note_create' %}" class="btn btn-dark shadow-sm px-4 py-2" style="border-radius: 6px; font-weight: 500;">
+                <i class="bi bi-plus-lg me-2"></i>Nouvelle Tâche
+            </a>
+        </div>
+    </div>
+    <hr class="mt-2 text-muted opacity-25">
+    </header>
+
+    <div class="notion-table-container">
+        <div class="table-responsive">
+        <table class="table align-middle shadow-sm bg-white" style="border-radius: 8px; overflow: hidden;">
+            <thead class="table-light">
+                <tr class="text-muted small text-uppercase">
+                    <th class="ps-4">Opération / Problème</th>
+                    <th>Dates (Début → Fin)</th>
+                    <th>Statut</th>
+                    <th class="text-end pe-4">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for note in notes %}
-                <tr>
-                    <td class="ps-4 align-middle">
-                        <div class="fw-semibold">{{ note.title }}</div>
+                {% for op in operations %}
+                <tr class="border-bottom">
+                    <td class="ps-4 py-3">
+                        <div class="fw-bold text-dark">{{ op.title }}</div>
+                        <div class="text-muted small">{{ op.problem_description|truncatechars:60 }}</div>
                     </td>
-                    <td class="align-middle">
-                        <div class="text-muted">{{ note.content|safe|truncatewords_html:30 }}</div>
+                    <td class="small text-secondary">
+                        {{ op.start_date|date:"d M"|default:"--" }} 
+                        <i class="bi bi-arrow-right mx-1"></i> 
+                        {{ op.end_date|date:"d M"|default:"--" }}
                     </td>
-                    <td class="text-center align-middle">
-                        {% for tag in note.tags.all %}
-                        <span class="badge bg-info text-dark me-1">{{ tag.name }}</span>
-                        {% empty %}
-                        <span class="text-muted">Aucun</span>
-                        {% endfor %}
-                    </td>
-                    <td class="text-center align-middle">
-                        {% if note.resultat == 'en_cours' %}
-                        <span class="badge bg-warning bg-opacity-75">
-                            <i class="bi bi-hourglass-split me-1"></i>En cours
-                        </span>
+                    <td>
+                        {% if op.status == 'termine' %}
+                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3">Terminé</span>
+                        {% elif op.status == 'bloque' %}
+                            <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3">Bloqué</span>
+                        {% elif op.status == 'en_cours' %}
+                            <span class="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3">En cours</span>
                         {% else %}
-                        <span class="badge bg-success bg-opacity-75">
-                            <i class="bi bi-check2-circle me-1"></i>Terminé
-                        </span>
+                            <span class="badge rounded-pill bg-light text-dark border px-3">Attente</span>
                         {% endif %}
                     </td>
-                    <td class="text-center align-middle">
-                        <div class="btn-group">
-                            <a href="{% url 'note_edit' note.pk %}" class="btn btn-warning btn-sm me-3"
-                                title="Modifier">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
-                            <a href="{% url 'note_delete' note.pk %}" class="btn btn-danger btn-sm" title="Supprimer">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function () {
-                                    document.querySelectorAll('.btn-danger[title="Supprimer"]').forEach(function (btn) {
-                                        btn.addEventListener('click', function (e) {
-                                            if (!confirm('Êtes-vous sûr de vouloir supprimer cette note ?')) {
-                                                e.preventDefault();
-                                            }
-                                        });
-                                    });
-                                });
-                            </script>
-                        </div>
+                    <td class="text-end pe-4">
+                        <a href="{% url 'note_edit' op.pk %}" class="btn btn-link text-dark p-1"><i class="bi bi-pencil"></i></a>
+                        <a href="{% url 'note_delete' op.pk %}" class="btn btn-link text-danger p-1"><i class="bi bi-trash3"></i></a>
                     </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center">Aucune note disponible.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        {% endblock %}
+    </div>
+</div>
+{% endblock %}

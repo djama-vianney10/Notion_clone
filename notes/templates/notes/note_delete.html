@@ -11,7 +11,7 @@
     <h1 class="text-center text-danger">🗑 Supprimer la Note</h1>
 
     <div class="card p-4 shadow">
-        <p class="fs-5">Es-tu sûr de vouloir supprimer <strong>{{ note.title }}</strong> ?</p>
+        <p>Es-tu sûr de vouloir supprimer l'opération : <strong>{{ operation.title }}</strong> ?</p>
         <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Oui, Supprimer</button>

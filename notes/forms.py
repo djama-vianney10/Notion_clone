@@ -1,37 +1,28 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Operation, Tag
 from ckeditor.widgets import CKEditorWidget
-from .models import Note, Tag
 
+# Formulaire d'inscription (indispensable pour ta vue register)
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
+        fields = ['username', 'email']
 
-
-class NoteForm(forms.ModelForm):
-    title = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    content = forms.CharField(widget=CKEditorWidget())
-    tags = forms.ModelMultipleChoiceField(
-        queryset=Tag.objects.all().order_by('name'),
-        widget=forms.SelectMultiple(attrs={
-            'class': 'form-select',
-            'style': 'width: 100%'
-        }),
-        required=False,
-        help_text='Sélectionnez un ou plusieurs tags'
-    )
-    resultat = forms.ChoiceField(
-        choices=[('en_cours', 'En cours'), ('termine', 'Terminé')],
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        initial='en_cours'
-    )
-
+# Formulaire technique
+class OperationForm(forms.ModelForm):
     class Meta:
-        model = Note
-        fields = ['title', 'content', 'tags', 'resultat']
+        model = Operation
+        fields = ['title', 'problem_description', 'proposed_solution', 'start_date', 'end_date', 'status', 'tags']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: Correction bug paiement Wave'}),
+            'problem_description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Décrivez le contexte...'}),
+            'proposed_solution': CKEditorWidget(),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'tags': forms.CheckboxSelectMultiple(attrs={'class': 'tag-list-checkbox'}),
+        }

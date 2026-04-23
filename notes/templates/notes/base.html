@@ -4,160 +4,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Notion Clone{% endblock %}</title>
+    <title>{% block title %}Opero | Pilotage Technique{% endblock %}</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
     <style>
         :root {
             --primary-color: #2c3e50;
-            --secondary-color: #34495e;
             --accent-color: #3498db;
+            --glass-bg: rgba(255, 255, 255, 0.75); /* Fond blanc translucide */
+            --glass-border: rgba(255, 255, 255, 0.3);
         }
 
         body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f0f2f5;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            /* Padding top pour compenser la navbar sticky */
+            padding-top: 80px;
         }
 
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            background: var(--primary-color) !important;
+        /* --- MODERN GLASSMORPHISM NAVBAR --- */
+        .navbar-modern {
+            background: var(--glass-bg) !important;
+            backdrop-filter: blur(12px); /* L'effet de flou */
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            transition: all 0.4s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
         }
 
         .navbar-brand {
-            font-weight: 600;
-            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary-color) !important;
+        }
+
+        .navbar-brand i {
+            color: var(--accent-color);
+            margin-right: 8px;
         }
 
         .nav-link {
+            color: #555 !important;
             font-weight: 500;
-            transition: all 0.3s ease;
+            padding: 0.8rem 1.2rem !important;
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link i {
+            font-size: 1.1rem;
         }
 
         .nav-link:hover {
             color: var(--accent-color) !important;
-            transform: translateY(-1px);
+            background: rgba(52, 152, 219, 0.1);
         }
 
-        .card {
+        .nav-link.active {
+            color: var(--accent-color) !important;
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        /* User Dropdown Styling */
+        .user-dropdown {
+            background: white;
             border: none;
             border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-top: 10px;
+        }
+
+        /* --- CARDS & UI ELEMENTS --- */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
         }
 
-        .table {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .table thead {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn {
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-sm {
-            border-radius: 6px;
-            padding: 0.25rem 0.5rem;
-        }
-
+        /* Badge Customization */
         .badge {
-            padding: 0.5em 0.8em;
-            font-weight: 500;
-            border-radius: 6px;
-        }
-
-        .container {
-            padding-top: 2rem;
-            padding-bottom: 2rem;
-        }
-
-        h1 {
-            color: var(--primary-color);
+            padding: 0.6em 1em;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Animation pour les badges de statut */
-        .badge {
-            transition: all 0.3s ease;
-        }
-
-        .badge:hover {
-            transform: scale(1.1);
+            border-radius: 50px; /* Style pill plus moderne */
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg fixed-top navbar-modern">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'note_list' %}">
-                <i class="bi bi-journal-bookmark"></i> Notion Clone
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+                <i class="bi bi-cpu-fill"></i> OPERO
             </a>
+            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'index' %}">
-                            <i class="bi bi-house-door"></i> Accueil
+                            <i class="bi bi-grid-1x2-fill"></i> Accueil
                         </a>
                     </li>
+                    
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'note_list' %}">
-                            <i class="bi bi-stickies"></i> Notes
+                            <i class="bi bi-kanban-fill"></i> Mes Opérations
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'dashboard' %}">
-                            <i class="bi bi-graph-up"></i> Tableau de Bord
+                            <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-person-circle"></i> {{ user.username }}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
+                        <ul class="dropdown-menu dropdown-menu-end user-dropdown border-0 shadow-lg">
                             <li>
-                                <a class="dropdown-item" href="{% url 'logout' %}">
-                                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                <a class="dropdown-item py-2" href="{% url 'logout' %}">
+                                    <i class="bi bi-box-arrow-right text-danger me-2"></i> Déconnexion
                                 </a>
                             </li>
                         </ul>
                     </li>
                     {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">
-                            <i class="bi bi-box-arrow-in-right"></i> Connexion
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'register' %}">
-                            <i class="bi bi-person-plus"></i> Inscription
+                    <li class="nav-item ms-lg-2">
+                        <a class="nav-link btn btn-outline-primary px-4 border-0" href="{% url 'login' %}">
+                            Connexion
                         </a>
                     </li>
                     {% endif %}
@@ -166,39 +157,45 @@
         </div>
     </nav>
 
-    <!-- Messages -->
-    <div class="container mt-4">
+    <div class="container">
         {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
         {% endif %}
     </div>
 
-    <!-- Contenu principal -->
-    <div class="container mt-4">
+    <main class="container">
         {% block content %}{% endblock %}
-    </div>
+    </main>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
     <script>
+        // Effet de changement au scroll pour la navbar
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 50) {
+                $('.navbar-modern').css('padding', '0.5rem 0');
+                $('.navbar-modern').css('background', 'rgba(255, 255, 255, 0.95)');
+            } else {
+                $('.navbar-modern').css('padding', '1rem 0');
+                $('.navbar-modern').css('background', 'var(--glass-bg)');
+            }
+        });
+
         $(document).ready(function () {
             $('.select2').select2({
                 theme: 'bootstrap-5',
-                width: 'style',
-                placeholder: 'Sélectionnez des tags'
+                width: '100%',
+                placeholder: 'Sélectionnez'
             });
         });
     </script>
     {% block extra_scripts %}{% endblock %}
-
 </body>
-
 </html>
