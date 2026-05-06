@@ -1,0 +1,1 @@
+web: gunicorn notion_clone.wsgi:application --bind 0.0.0.0:$PORT
