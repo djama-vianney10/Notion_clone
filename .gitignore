@@ -142,3 +142,6 @@ media/
 
 # Logs
 *.log
+
+# Production environment files (contain real secrets)
+.env.production
